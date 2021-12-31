@@ -15,20 +15,49 @@ class HomeView extends StatelessWidget {
           builder: (_, provider, child) => Stack(
                 children: [
                   Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: provider.users
-                            .map<Widget>((user) => UserInfoWidget(
-                                  user: user,
-                                  amountSoldiers:
-                                      provider.amountTerritoriesPerUser[
-                                          provider.users.indexOf(user)],
-                                ))
-                            .toList(),
-                      )),
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Column(
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              'Usuario selecionado',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              provider.userSelected!.name,
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: provider.users
+                              .map<Widget>((user) => UserInfoWidget(
+                                    user: user,
+                                    amountSoldiers:
+                                        provider.amountTerritoriesPerUser[
+                                            provider.users.indexOf(user)],
+                                  ))
+                              .toList(),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              width: MediaQuery.of(context).size.width *
+                                  (provider.progressTimer / 100),
+                              height: 10,
+                              color: Colors.red,
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                   Stack(
                     fit: StackFit.expand,
                     children: provider.territories
