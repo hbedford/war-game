@@ -35,8 +35,8 @@ class WARAPI {
     """, variables: {'objects': list}).catchError((e) => print(e));
   }
 
-  Future<dynamic> listenServer() async {
-    return await hasuraConnect.query(""" query MyQuery {
+  Future<Snapshot> listenServer() async {
+    return await hasuraConnect.subscription(""" subscription MyQuery {
   server {
     id
     host_user_id
@@ -45,6 +45,34 @@ class WARAPI {
     third_user_id
     fourth_user_id
     selected_user_id
-  }""");
+  }}""");
+  }
+
+  Future<Map<String, dynamic>> getLogin(String email) async {
+    return await hasuraConnect.query("""
+    query MyQuery {
+      user(where: {email: {_eq: "$email"}}) {
+        email
+        id
+        name
+      }
+    }
+    """);
+  }
+
+  Future<Map<String, dynamic>> registerLogin(String email, String name) async {
+    return await hasuraConnect.mutation("""
+    mutation MyMutation {
+  insert_user(objects: {email: "$email", name: "$name"}) {
+    returning {
+      id
+      name
+      email
+    }
+    affected_rows
+  }
+}
+
+    """);
   }
 }

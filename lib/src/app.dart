@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'screens/home_screen.dart';
+import 'package:war/src/views/lobby/lobby_view.dart';
+import 'package:war/src/views/login/login_view.dart';
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -8,7 +8,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(),
+      home: LoginView(),
     );
   }
 }

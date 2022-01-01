@@ -9,13 +9,14 @@ class LobbyViewModel with ChangeNotifier {
   Server? _server;
   Server? get server => _server;
   User? _user;
-  User? get user=>_user;
+  User? get user => _user;
 
   loadServer() async {
     Snapshot snapshot = await api.listenServer();
     snapshot.listen((event) {
-      event.first
-      if(_user!=null && _user!.id == event)
+      print(event);
+      /* event.first
+      if(_user!=null && _user!.id == event); */
     });
   }
 }

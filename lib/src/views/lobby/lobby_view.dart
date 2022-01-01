@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:war/src/views/lobby/lobby_viewmodel.dart';
 
 class LobbyView extends StatelessWidget {
   const LobbyView({Key? key}) : super(key: key);
@@ -6,8 +8,13 @@ class LobbyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [],
+      body: ChangeNotifierProvider(
+        create: (_) => LobbyViewModel()..loadServer(),
+        child: Consumer<LobbyViewModel>(
+          builder: (_, provider, child) => Column(
+            children: [],
+          ),
+        ),
       ),
     );
   }

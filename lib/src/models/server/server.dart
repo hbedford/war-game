@@ -15,5 +15,6 @@ class Server {
     required this.thirdUserId,
     required this.fourthUserId,
   });
-  factory Server.fromJson(Map map)=>Server(id: map['id'], hostUserId: hostUserId, userSelectedId: userSelectedId, firstUserId: firstUserId, secondUserId: secondUserId, thirdUserId: thirdUserId, fourthUserId: fourthUserId)
+  /* factory Server.fromJson(Map map)=>Server(id: map['id'], hostUserId: map[''], userSelectedId: userSelectedId, firstUserId: firstUserId, secondUserId: secondUserId, thirdUserId: thirdUserId, fourthUserId: fourthUserId)
+ */
 }
