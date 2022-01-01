@@ -1,5 +1,7 @@
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/territory/territory.dart';
+import 'package:war/src/models/user/user.dart';
 
 class WARAPI {
   HasuraConnect hasuraConnect =
@@ -36,16 +38,22 @@ class WARAPI {
   }
 
   Future<Snapshot> listenServer() async {
-    return await hasuraConnect.subscription(""" subscription MyQuery {
-  server {
-    id
-    host_user_id
-    first_user_id
-    second_user_id
-    third_user_id
-    fourth_user_id
-    selected_user_id
-  }}""");
+    return await hasuraConnect.subscription(""" 
+    subscription MySubscription {
+      server {
+        id
+        user {
+          id
+          name
+          email
+        }
+        first_user_id
+        second_user_id
+        third_user_id
+        fourth_user_id
+        selected_user_id
+      }
+    }""");
   }
 
   Future<Map<String, dynamic>> getLogin(String email) async {
@@ -73,6 +81,33 @@ class WARAPI {
   }
 }
 
+    """);
+  }
+
+  Future<Map<String, dynamic>> openServer(User user) async {
+    return await hasuraConnect.mutation("""
+    mutation MyMutation {
+      insert_server(objects: {host_user_id: ${user.id}}) {
+        returning {
+          id
+          user {
+            id
+            email
+            name
+          }
+        }
+      }
+    }
+    """);
+  }
+
+  Future<Map<String, dynamic>> start(User user, Server server) async {
+    return await hasuraConnect.mutation("""
+    mutation MyMutation {
+      update_server(where: {id: {_eq: ${server.id}}, host_user_id: {_eq: ${user.id}}}, _set: {stats: 2}) {
+        affected_rows
+      }
+    }
     """);
   }
 }

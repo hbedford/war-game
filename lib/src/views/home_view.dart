@@ -58,7 +58,7 @@ class HomeView extends StatelessWidget {
                         color: Colors.red,
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -76,18 +76,17 @@ class HomeView extends StatelessWidget {
                       ))
                   .toList(),
             ),
-            /*  Positioned.fill(
-                child:  */
             GestureDetector(
-                onTapDown: (details) {
-                  print(getList(context, false, details.localPosition.dx));
-                  print(getList(context, true, details.globalPosition.dy));
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  height: double.infinity,
-                  width: double.infinity,
-                )) /* ) */,
+              onTapDown: (details) {
+                print(getList(context, false, details.localPosition.dx));
+                print(getList(context, true, details.globalPosition.dy));
+              },
+              child: Container(
+                color: Colors.transparent,
+                height: double.infinity,
+                width: double.infinity,
+              ),
+            ),
           ],
         ),
       ),

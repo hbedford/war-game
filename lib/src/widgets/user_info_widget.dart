@@ -23,7 +23,7 @@ class UserInfoWidget extends StatelessWidget {
           Text(
             amountSoldiers.toString(),
             style: TextStyle(color: Colors.white),
-          )
+          ),
         ],
       ),
     );

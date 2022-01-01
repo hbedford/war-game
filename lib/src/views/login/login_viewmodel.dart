@@ -1,9 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:war/main.dart';
+import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/war_api.dart';
+import 'package:war/src/widgets/snackbar_error.dart';
 
 class LoginViewModel with ChangeNotifier {
   WARAPI api = WARAPI();
+
+  User? _user;
+  User? get user => _user;
 
   String _email = '';
   String get email => _email;
@@ -27,18 +32,57 @@ class LoginViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  onTap() async {
-    if (isValidEmail) {
-      var result = await api.getLogin(_email);
-      if (result['data']['users'].isEmpty)
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  onLogin() async {
+    if (!isValidEmail) {
+      ScaffoldMessenger.of(navigationApp.currentContext!)
+          .showSnackBar(SnackbarError(text: 'Digite um email valido'));
+      return;
     }
+    var result = await api.getLogin(_email);
+    List<User> list = result['data']['user']
+        .map<User>((item) => User.fromJson(item))
+        .toList();
+    if (list.isEmpty) {
+      ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
+          SnackbarError(text: 'Nenhum usuario com esse email encontrado'));
+      return;
+    }
+
+    changeUser(list.first);
+    Navigator.pushNamedAndRemoveUntil(
+        navigationApp.currentContext!, '/lobby', (route) => false);
+  }
+
+  changeUser(User value) {
+    _user = value;
+    notifyListeners();
   }
 
   onRegistrar() async {
+    if (!isValidEmail) {
+      ScaffoldMessenger.of(navigationApp.currentContext!)
+          .showSnackBar(SnackbarError(text: 'Digite um email valido'));
+      return;
+    }
+    if (!isValidName) {
+      ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
+          SnackbarError(text: 'Digite um nome com pelo menos 3 caracteres'));
+      return;
+    }
     if (isValidEmail && isValidName) {
       var result = await api.registerLogin(_email, _name);
-      print(result);
+      List<User> list = result['data']['insert_user']['returning']
+          .map((item) => User.fromJson(item))
+          .toList();
+      if (list.isEmpty) {
+        ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
+            SnackbarError(
+                text: 'Ocorreu algum problema ao cadastrar o usuario'));
+        return;
+      }
+      changeUser(list.first);
+      Navigator.pushNamedAndRemoveUntil(
+          navigationApp.currentContext!, '/lobby', (route) => false);
     }
   }
 

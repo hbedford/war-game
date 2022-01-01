@@ -61,11 +61,13 @@ class HomeViewModel with ChangeNotifier {
   List<User> _users = [
     User(
       id: 0,
+      email: '',
       name: 'Hugo',
       objective: Objective(id: 0, name: 'nao sei'),
     ),
     User(
       id: 1,
+      email: '',
       name: 'Mayara',
       objective: Objective(id: 0, name: 'nao sei'),
     ),

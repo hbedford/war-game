@@ -37,7 +37,7 @@ class TerritoryItemWidget extends StatelessWidget {
                   Text(
                     territory.amountSoldiers.toString(),
                     style: TextStyle(color: Colors.white),
-                  )
+                  ),
                 ],
               ),
             ),
