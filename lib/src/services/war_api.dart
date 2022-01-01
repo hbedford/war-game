@@ -17,6 +17,7 @@ class WARAPI {
           amountsoldiers
           offset
           user_id
+          neighbors
         }
       }
     }
@@ -32,5 +33,18 @@ class WARAPI {
   }
 }
     """, variables: {'objects': list}).catchError((e) => print(e));
+  }
+
+  Future<dynamic> listenServer() async {
+    return await hasuraConnect.query(""" query MyQuery {
+  server {
+    id
+    host_user_id
+    first_user_id
+    second_user_id
+    third_user_id
+    fourth_user_id
+    selected_user_id
+  }""");
   }
 }

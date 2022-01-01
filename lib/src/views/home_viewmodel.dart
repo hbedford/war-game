@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -8,7 +7,6 @@ import 'package:war/src/models/objective/objective.dart';
 import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/data.dart';
-import 'package:war/src/services/graphql_helper.dart';
 import 'package:war/src/services/war_api.dart';
 
 Data data = Data();
@@ -16,6 +14,11 @@ Data data = Data();
 class HomeViewModel with ChangeNotifier {
   List<Continent> _continents = [
     data.americaDoNorte,
+    data.americaDoSul,
+    data.europa,
+    data.africa,
+    data.asia,
+    data.oceania
   ];
   List<Continent> get continents => _continents;
 
@@ -94,7 +97,7 @@ class HomeViewModel with ChangeNotifier {
     changeSelectUser(_users.first);
     changeMe(_users.first);
     timer();
-    addTerritories();
+    /* addTerritories(); */
   }
 
   changeMe(User? value) {
@@ -110,7 +113,7 @@ class HomeViewModel with ChangeNotifier {
     _continents[getIndexOfContinent(territory.id)]
         .territories
         .firstWhere((item) => item.id == territory.id)
-        .amountSoldiers = 100;
+        .amountSoldiers = 1;
     notifyListeners();
   }
 
