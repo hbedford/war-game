@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:war/src/views/home_viewmodel.dart';
 import 'package:war/src/views/lobby/lobby_viewmodel.dart';
@@ -14,9 +15,14 @@ class HomeView extends StatelessWidget {
       (position * 3);
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<HomeViewModel>(
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    return ChangeNotifierProxyProvider<LobbyViewModel, HomeViewModel>(
       create: (_) => HomeViewModel()..start(),
-      /*   update: (_, lobbyViewModel, homeViewModel) => homeViewModel!..start(), */
+      update: (_, lobbyViewModel, homeViewModel) =>
+          homeViewModel!.updateServer(lobbyViewModel.server),
       child: Consumer<HomeViewModel>(
         builder: (_, provider, child) => Stack(
           children: [

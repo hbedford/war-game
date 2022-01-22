@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:war/src/models/continents/continent.dart';
 import 'package:war/src/models/objective/objective.dart';
+import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/data.dart';
@@ -102,6 +103,7 @@ class HomeViewModel with ChangeNotifier {
     /* addTerritories(); */
   }
 
+  updateServer(Server? value) {}
   changeMe(User? value) {
     _me = value;
     notifyListeners();
