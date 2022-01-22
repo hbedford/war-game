@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:war/main.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/war_api.dart';
@@ -53,5 +54,6 @@ class LobbyViewModel with ChangeNotifier {
 
   start() async {
     Map<String, dynamic> result = await api.start(_user!, _server!);
+    Navigator.pushNamed(navigationApp.currentContext!, '/home');
   }
 }

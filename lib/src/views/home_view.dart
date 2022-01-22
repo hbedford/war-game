@@ -8,7 +8,6 @@ import 'package:war/src/widgets/user_info_widget.dart';
 class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
   getList(BuildContext context, bool isHeight, double position) =>
-      /* ( */ /* ) + */
       (isHeight
           ? MediaQuery.of(context).size.height
           : MediaQuery.of(context).size.width) -
