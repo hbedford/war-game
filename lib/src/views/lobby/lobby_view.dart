@@ -39,7 +39,7 @@ class LobbyView extends StatelessWidget {
                             width: 25,
                           ),
                           Container(
-                            width: 400,
+                            width: MediaQuery.of(context).size.width * 0.1,
                             height: MediaQuery.of(context).size.height * 0.4,
                             child: ListView.builder(
                               itemCount: provider.users.length,
@@ -74,7 +74,7 @@ class LobbyView extends StatelessWidget {
                             width: 25,
                           ),
                           Container(
-                            width: 400,
+                            width: MediaQuery.of(context).size.width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.4,
                             child: provider.servers.isEmpty
                                 ? Center(
