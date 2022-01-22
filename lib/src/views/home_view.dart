@@ -14,9 +14,9 @@ class HomeView extends StatelessWidget {
       (position * 3);
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProxyProvider<LobbyViewModel, HomeViewModel>(
+    return ChangeNotifierProvider<HomeViewModel>(
       create: (_) => HomeViewModel()..start(),
-      update: (_, lobbyViewModel, homeViewModel) => homeViewModel!..start(),
+      /*   update: (_, lobbyViewModel, homeViewModel) => homeViewModel!..start(), */
       child: Consumer<HomeViewModel>(
         builder: (_, provider, child) => Stack(
           children: [
