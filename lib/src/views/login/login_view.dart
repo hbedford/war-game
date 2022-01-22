@@ -49,10 +49,14 @@ class _LoginViewState extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CupertinoButton.filled(
-                  child: Text(provider.isRegistering ? 'Registrar' : 'Entrar'),
-                  onPressed: provider.isRegistering
-                      ? provider.onRegistrar
-                      : provider.onLogin,
+                  child: provider.isLoading
+                      ? CircularProgressIndicator()
+                      : Text(provider.isRegistering ? 'Registrar' : 'Entrar'),
+                  onPressed: provider.isLoading
+                      ? null
+                      : provider.isRegistering
+                          ? provider.onRegistrar
+                          : provider.onLogin,
                 ),
                 SizedBox(
                   width: 16,

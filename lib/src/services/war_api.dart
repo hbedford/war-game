@@ -1,6 +1,5 @@
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:war/src/models/server/server.dart';
-import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 
 class WARAPI {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:war/src/views/home_viewmodel.dart';
+import 'package:war/src/views/lobby/lobby_viewmodel.dart';
 import 'package:war/src/widgets/territory_item_widget.dart';
 import 'package:war/src/widgets/user_info_widget.dart';
 
@@ -14,8 +15,9 @@ class HomeView extends StatelessWidget {
       (position * 3);
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
+    return ChangeNotifierProxyProvider<LobbyViewModel, HomeViewModel>(
       create: (_) => HomeViewModel()..start(),
+      update: (_, lobbyViewModel, homeViewModel) => homeViewModel!..start(),
       child: Consumer<HomeViewModel>(
         builder: (_, provider, child) => Stack(
           children: [

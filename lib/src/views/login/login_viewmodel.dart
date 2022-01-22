@@ -22,6 +22,9 @@ class LoginViewModel with ChangeNotifier {
   bool _isRegistering = false;
   bool get isRegistering => _isRegistering;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   onChangedEmail(String value) {
     _email = value;
     notifyListeners();
@@ -32,12 +35,18 @@ class LoginViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  changeIsLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   onLogin() async {
     if (!isValidEmail) {
       ScaffoldMessenger.of(navigationApp.currentContext!)
           .showSnackBar(SnackbarError(text: 'Digite um email valido'));
       return;
     }
+    changeIsLoading(true);
     var result = await api.getLogin(_email);
     List<User> list = result['data']['user']
         .map<User>((item) => User.fromJson(item))
@@ -45,6 +54,8 @@ class LoginViewModel with ChangeNotifier {
     if (list.isEmpty) {
       ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
           SnackbarError(text: 'Nenhum usuario com esse email encontrado'));
+
+      changeIsLoading(false);
       return;
     }
 
@@ -70,11 +81,13 @@ class LoginViewModel with ChangeNotifier {
       return;
     }
     if (isValidEmail && isValidName) {
+      changeIsLoading(true);
       var result = await api.registerLogin(_email, _name);
       List<User> list = result['data']['insert_user']['returning']
           .map((item) => User.fromJson(item))
           .toList();
       if (list.isEmpty) {
+        changeIsLoading(false);
         ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
             SnackbarError(
                 text: 'Ocorreu algum problema ao cadastrar o usuario'));
