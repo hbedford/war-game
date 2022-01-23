@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:war/main.dart';
 import 'package:war/src/screens/login/login_screen.dart';
-import 'package:war/src/views/home_view.dart';
-import 'package:war/src/views/lobby/lobby_view.dart';
-import 'package:war/src/views/login/login_view.dart';
+import 'package:war/src/screens/server/server_screen.dart';
 
-import 'screens/home/home_screen.dart';
 import 'screens/lobby/lobby_screen.dart';
 import 'views/login/login_viewmodel.dart';
+import 'views/server/server_viewmodel.dart';
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -18,6 +16,9 @@ class App extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
+        ChangeNotifierProvider(
+          create: (_) => ServerViewModel(),
+        )
       ],
       child: MaterialApp(
         navigatorKey: navigationApp,
@@ -25,7 +26,7 @@ class App extends StatelessWidget {
         routes: {
           '/login': (_) => LoginScreen(),
           '/lobby': (_) => LobbyScreen(),
-          '/home': (_) => HomeScreen(),
+          '/server': (_) => ServerScreen(),
         },
       ),
     );

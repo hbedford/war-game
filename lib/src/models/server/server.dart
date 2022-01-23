@@ -8,6 +8,7 @@ class Server {
   final int? secondUserId;
   final int? thirdUserId;
   final int? fourthUserId;
+  final bool isStarted;
   Server({
     required this.id,
     required this.hostUser,
@@ -16,6 +17,7 @@ class Server {
     required this.secondUserId,
     required this.thirdUserId,
     required this.fourthUserId,
+    required this.isStarted,
   });
   factory Server.fromJson(Map map) => Server(
         id: map['id'],
@@ -25,5 +27,6 @@ class Server {
         secondUserId: map['second_user_id'],
         thirdUserId: map['third_user_id'],
         fourthUserId: map['fourth_user_id'],
+        isStarted: map['isstarted'],
       );
 }

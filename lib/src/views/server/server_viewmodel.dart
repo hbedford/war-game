@@ -12,7 +12,7 @@ import 'package:war/src/services/war_api.dart';
 
 Data data = Data();
 
-class HomeViewModel with ChangeNotifier {
+class ServerViewModel with ChangeNotifier {
   List<Continent> _continents = [
     data.americaDoNorte,
     data.americaDoSul,
@@ -73,6 +73,7 @@ class HomeViewModel with ChangeNotifier {
       objective: Objective(id: 0, name: 'nao sei'),
     ),
   ];
+
   List<User> get users => _users;
 
   User? _userSelected;
@@ -86,7 +87,11 @@ class HomeViewModel with ChangeNotifier {
 
   int _currentTime = 18000;
   int get currentTime => _currentTime;
+
   int get progressTimer => ((_currentTime * 100) / 18000).round();
+
+  bool _disposed = false;
+
   start() {
     int indexUser = 0;
     while (territoriesWithoutUser.length > 0) {
@@ -241,5 +246,18 @@ class HomeViewModel with ChangeNotifier {
     var result = await api.addContinents(
         territories.map<Map<String, dynamic>>((e) => e.toMap).toList());
     print(result);
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
   }
 }

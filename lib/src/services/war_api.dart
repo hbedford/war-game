@@ -1,6 +1,10 @@
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/user/user.dart';
+import 'package:war/src/services/resultlr.dart';
+
+import 'graphql/server_graphql.dart';
 
 class WARAPI {
   HasuraConnect hasuraConnect =
@@ -51,6 +55,7 @@ class WARAPI {
         third_user_id
         fourth_user_id
         selected_user_id
+        isstarted
       }
     }""");
   }
@@ -84,29 +89,18 @@ class WARAPI {
   }
 
   Future<Map<String, dynamic>> openServer(User user) async {
-    return await hasuraConnect.mutation("""
-    mutation MyMutation {
-      insert_server(objects: {host_user_id: ${user.id}}) {
-        returning {
-          id
-          user {
-            id
-            email
-            name
-          }
-        }
-      }
-    }
-    """);
+    ServerGraphQL graphql = ServerGraphQL();
+    return await hasuraConnect.mutation(graphql.openServer(user.id));
   }
 
-  Future<Map<String, dynamic>> start(User user, Server server) async {
-    return await hasuraConnect.mutation("""
-    mutation MyMutation {
-      update_server(where: {id: {_eq: ${server.id}}, host_user_id: {_eq: ${user.id}}}, _set: {stats: 2}) {
-        affected_rows
-      }
+  Future<ResultLR<Failure, Server>> startGame(int serverId, int userId) async {
+    ServerGraphQL graphql = ServerGraphQL();
+    Map<String, dynamic> result =
+        await hasuraConnect.mutation(graphql.startGame(serverId, userId));
+    if (result['data'] != null) {
+      return Right(
+          Server.fromJson(result['data']['update_server']['returning'].first));
     }
-    """);
+    return Left(Failure(0, ''));
   }
 }

@@ -25,6 +25,8 @@ class LoginViewModel with ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _disposed = false;
+
   onChangedEmail(String value) {
     _email = value;
     notifyListeners();
@@ -102,5 +104,18 @@ class LoginViewModel with ChangeNotifier {
   changeIsRegistering() {
     _isRegistering = !_isRegistering;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_disposed) {
+      super.notifyListeners();
+    }
   }
 }

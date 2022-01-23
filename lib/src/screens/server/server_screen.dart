@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:war/src/views/home_view.dart';
+import 'package:war/src/views/server/server_view.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class ServerScreen extends StatelessWidget {
+  const ServerScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
+        fit: StackFit.expand,
         children: [
           Image.asset(
             'assets/background.jpg',
             fit: BoxFit.cover,
           ),
           Positioned.fill(
-            child: HomeView(),
+            child: ServerView(),
           ),
         ],
       ),

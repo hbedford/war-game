@@ -1,8 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:war/src/models/failure/failure.dart';
+import 'package:war/src/models/server/server.dart';
+import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/views/lobby/lobby_viewmodel.dart';
 import 'package:war/src/views/login/login_viewmodel.dart';
+import 'package:war/src/views/server/server_viewmodel.dart';
+import 'package:war/src/widgets/snackbar_error.dart';
 
 import 'widgets/server_listtile_widget.dart';
 import 'widgets/user_listtile_widget.dart';
@@ -54,9 +59,27 @@ class LobbyView extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CupertinoButton.filled(
-                          child: Text('Iniciar'),
-                          onPressed: provider.start,
+                        Consumer<ServerViewModel>(
+                          builder: (_, serverProvider, child) =>
+                              CupertinoButton.filled(
+                            child: Text('Iniciar'),
+                            onPressed: () async {
+                              ResultLR<Failure, Server> result =
+                                  await provider.startGame();
+                              if (result.isRight()) {
+                                serverProvider.start();
+                                serverProvider
+                                    .updateServer((result as Right).value);
+                                Navigator.pushNamedAndRemoveUntil(
+                                    context, '/server', (route) => false);
+                                return;
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackbarError(
+                                      text: ((result as Left).value as Failure)
+                                          .error));
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -75,18 +98,22 @@ class LobbyView extends StatelessWidget {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.4,
                           height: MediaQuery.of(context).size.height * 0.4,
-                          child: provider.servers.isEmpty
+                          child: provider.isLoading
                               ? Center(
-                                  child: Text('Nenhum servidor encontrado'),
+                                  child: CircularProgressIndicator(),
                                 )
-                              : ListView.builder(
-                                  itemCount: provider.servers.length,
-                                  itemBuilder: (context, int index) =>
-                                      ServerListTileWidget(
-                                    index: index,
-                                    server: provider.servers[index],
-                                  ),
-                                ),
+                              : provider.servers.isEmpty
+                                  ? Center(
+                                      child: Text('Nenhum servidor encontrado'),
+                                    )
+                                  : ListView.builder(
+                                      itemCount: provider.servers.length,
+                                      itemBuilder: (context, int index) =>
+                                          ServerListTileWidget(
+                                        index: index,
+                                        server: provider.servers[index],
+                                      ),
+                                    ),
                         ),
                       ],
                     ),
