@@ -13,7 +13,7 @@ class ServerScreen extends StatelessWidget {
         children: [
           Image.asset(
             'assets/background.jpg',
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
           ),
           Positioned.fill(
             child: ServerView(),

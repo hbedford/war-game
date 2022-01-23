@@ -15,84 +15,87 @@ class ServerView extends StatelessWidget {
       (position * 3);
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
+    /*   SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
-    ]);
+    ]); */
     return Consumer<ServerViewModel>(
-      builder: (_, provider, child) => Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Text(
-                      'Usuario selecionado',
-                      style: TextStyle(
-                        color: Colors.white,
+      builder: (_, provider, child) {
+        return Stack(
+          alignment: Alignment.center,
+          fit: StackFit.expand,
+          children: [
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      Text(
+                        'Usuario selecionado',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Text(
-                      provider.userSelected!.name,
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: provider.users
-                      .map<Widget>((user) => UserInfoWidget(
-                            user: user,
-                            amountSoldiers: provider.amountTerritoriesPerUser[
-                                provider.users.indexOf(user)],
-                          ))
-                      .toList(),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width *
-                          (provider.progressTimer / 100),
-                      height: 10,
-                      color: Colors.red,
-                    ),
-                  ],
-                ),
-              ],
+                      Text(
+                        provider.userSelected!.name,
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: provider.users
+                        .map<Widget>((user) => UserInfoWidget(
+                              user: user,
+                              amountSoldiers: provider.amountTerritoriesPerUser[
+                                  provider.users.indexOf(user)],
+                            ))
+                        .toList(),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            (provider.progressTimer / 100),
+                        height: 10,
+                        color: Colors.red,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          Stack(
-            fit: StackFit.expand,
-            children: provider.territories
-                .map<Widget>((territory) => TerritoryItemWidget(
-                      onTap: () => provider.attack(
-                          territory,
-                          provider.users.firstWhere(
-                              (user) => user.id == territory.userId)),
-                      territory: territory,
-                      user: provider.users
-                          .firstWhere((user) => user.id == territory.userId),
-                    ))
-                .toList(),
-          ),
-          GestureDetector(
-            onTapDown: (details) {
-              print(getList(context, false, details.localPosition.dx));
-              print(getList(context, true, details.globalPosition.dy));
-            },
-            child: Container(
-              color: Colors.transparent,
-              height: double.infinity,
-              width: double.infinity,
+            Stack(
+              fit: StackFit.expand,
+              children: provider.territories
+                  .map<Widget>((territory) => TerritoryItemWidget(
+                        onTap: () => provider.attack(
+                            territory,
+                            provider.users.firstWhere(
+                                (user) => user.id == territory.userId)),
+                        territory: territory,
+                        user: provider.users
+                            .firstWhere((user) => user.id == territory.userId),
+                      ))
+                  .toList(),
             ),
-          ),
-        ],
-      ),
+            GestureDetector(
+              onTapDown: (details) {
+                print(getList(context, false, details.localPosition.dx));
+                print(getList(context, true, details.globalPosition.dy));
+              },
+              child: Container(
+                color: Colors.transparent,
+                height: double.infinity,
+                width: double.infinity,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

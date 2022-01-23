@@ -83,6 +83,20 @@ class Data {
 }
 
 class DataTerritory {
+  List<Territory> get territories => [
+        alaska,
+        mackenzie,
+        groelandia,
+        vancouver,
+        ottawa,
+        labrador,
+        california,
+        novaYork,
+        mexico,
+        venezuela,
+        peru,
+        brasil
+      ];
   final alaska = Territory(
     id: 1,
     continentId: 1,
@@ -160,11 +174,11 @@ class DataTerritory {
     neighbors: [13, 12, 10],
   );
   final brasil = Territory(
-    id: 12,
-    continentId: 2,
-    name: 'Brasil',
-    neighbors: [13, 11, 10, 21],
-  );
+      id: 12,
+      continentId: 2,
+      name: 'Brasil',
+      neighbors: [13, 11, 10, 21],
+      offset: Offset(24, 46));
   final argentina = Territory(
     id: 13,
     continentId: 2,

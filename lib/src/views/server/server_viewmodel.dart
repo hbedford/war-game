@@ -109,6 +109,7 @@ class ServerViewModel with ChangeNotifier {
   }
 
   updateServer(Server? value) {}
+
   changeMe(User? value) {
     _me = value;
     notifyListeners();

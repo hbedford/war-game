@@ -4,7 +4,7 @@ import 'package:graphql/client.dart';
 class GraphQLHelper {
   final durationTimeOut = Duration(seconds: 15);
 
-  GraphQLClient getGraphQLClient({String? token}) {
+  GraphQLClient getGraphQLClient(Store store, {String? token}) {
     final Link _link = HttpLink(
       'https://game-war.herokuapp.com/v1/graphql',
       /* defaultHeaders: token != null
@@ -15,7 +15,7 @@ class GraphQLHelper {
     );
 
     return GraphQLClient(
-      cache: GraphQLCache(),
+      cache: GraphQLCache(store: store),
       link: _link,
     );
   }
@@ -24,7 +24,9 @@ class GraphQLHelper {
     required String data,
     String? token,
   }) async {
+    final store = await HiveStore.open(path: 'my/cache/path');
     final GraphQLClient _client = getGraphQLClient(
+      store,
       token: token,
     );
 
@@ -57,7 +59,9 @@ class GraphQLHelper {
     required String data,
     String? token,
   }) async {
+    final store = await HiveStore.open(path: 'my/cache/path');
     final GraphQLClient _client = getGraphQLClient(
+      store,
       token: token,
     );
 
