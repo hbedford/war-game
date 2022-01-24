@@ -152,40 +152,37 @@ class ServerViewModel with ChangeNotifier {
     }
   }
 
-  bool attack(Territory territory, int userId) {
+  attack(Territory territory, int userId) {
     if (_userSelected!.id != _me!.id) {
       ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
         SnackbarError(text: 'Não esta na sua vez'),
       );
-      return false;
+      return;
     }
 
     if (_territorySelected == null && territory.userId != _userSelected!.id)
-      return false;
+      return;
 
-    //se o territorio é do usuario  e é o usuario atual a atacar
     if ((_territorySelected == null && territory.userId == _userSelected!.id) ||
         _territorySelected!.userId == userId) {
       changeSelectTerritory(territory);
-      return false;
-    }
-    //se o territorio selecionado que quer usar para atacar tiver apenas 1 soldado
-    if (_territorySelected!.amountSoldiers == 1) {
-      changeSelectTerritory(null);
-      return false;
+      return;
     }
 
-    //verifica se é um vizinho atacavel
+    if (_territorySelected!.amountSoldiers == 1) {
+      changeSelectTerritory(null);
+      return;
+    }
     if (!_territorySelected!.neighbors.contains(territory.id)) {
       ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
           SnackbarError(text: 'Este territorio não é um vizinho atacavel'));
-      return false;
+      return;
     }
 
-    return realizeAttack(territory);
+    realizeAttack(territory);
   }
 
-  bool realizeAttack(Territory territory) {
+  realizeAttack(Territory territory) {
     //verifica quantos podem atacar, ate no maximo 3, mas mantendo 1 como dono do territorio
     int amountAtack = _territorySelected!.amountSoldiers > 3
         ? 3
@@ -215,15 +212,10 @@ class ServerViewModel with ChangeNotifier {
     }
     print(lostAttack);
     print(lostDefense);
-    if (lostDefense >= territory.amountSoldiers) {
+    if (lostDefense >= territory.amountSoldiers)
       changeTerritoryUser(territory.id);
-      changeAmountSoldiers(lostAttack + 1, _territorySelected!);
-      return true;
-    }
-
     changeAmountSoldiers(lostDefense, territory);
     changeAmountSoldiers(lostAttack, _territorySelected!);
-    return false;
   }
 
   changeTerritoryUser(int territoryId) {
