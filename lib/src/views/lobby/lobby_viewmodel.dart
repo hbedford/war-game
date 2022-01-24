@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:war/main.dart';
 import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/user/user.dart';
@@ -7,6 +11,7 @@ import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/services/war_api.dart';
 
 class LobbyViewModel with ChangeNotifier {
+  GetStorage _getStorage = GetStorage();
   WARAPI api = WARAPI();
 
   Server? _server;
@@ -42,6 +47,7 @@ class LobbyViewModel with ChangeNotifier {
 
   loadServer() async {
     changeIsLoading(true);
+    User user = User.fromJson(jsonDecode(_getStorage.read('user')));
     Snapshot snapshot = await api.listenServer();
     snapshot.listen((result) {
       _servers = result['data']['server']
@@ -50,6 +56,12 @@ class LobbyViewModel with ChangeNotifier {
       notifyListeners();
       changeIsLoading(false);
     });
+  }
+
+  deslogar() {
+    _getStorage.write('user', null);
+    Navigator.pushNamedAndRemoveUntil(
+        navigationApp.currentContext!, '/login', (route) => false);
   }
 
   openServer() async {

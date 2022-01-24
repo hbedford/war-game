@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:war/main.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/war_api.dart';
@@ -6,6 +9,7 @@ import 'package:war/src/widgets/snackbar_error.dart';
 
 class LoginViewModel with ChangeNotifier {
   WARAPI api = WARAPI();
+  GetStorage _getStorage = GetStorage();
 
   User? _user;
   User? get user => _user;
@@ -26,6 +30,17 @@ class LoginViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   bool _disposed = false;
+  TextEditingController emailController = TextEditingController();
+
+  checkLogin() async {
+    String? getData = _getStorage.read('user');
+    print(getData);
+    if (getData == null) return null;
+    User userLoaded = User.fromJson(jsonDecode(getData));
+
+    onChangedEmail(userLoaded.email);
+    await onLogin();
+  }
 
   onChangedEmail(String value) {
     _email = value;
@@ -60,8 +75,10 @@ class LoginViewModel with ChangeNotifier {
       changeIsLoading(false);
       return;
     }
-
     changeUser(list.first);
+
+    _getStorage.write('user', jsonEncode(list.first.toMap));
+    print(_getStorage.read('user'));
     Navigator.pushNamedAndRemoveUntil(
         navigationApp.currentContext!, '/lobby', (route) => false);
   }

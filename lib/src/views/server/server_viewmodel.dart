@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:war/main.dart';
 import 'package:war/src/models/continents/continent.dart';
 import 'package:war/src/models/objective/objective.dart';
 import 'package:war/src/models/server/server.dart';
@@ -9,8 +11,11 @@ import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/data.dart';
 import 'package:war/src/services/war_api.dart';
+import 'package:war/src/widgets/snackbar_error.dart';
 
 Data data = Data();
+
+int _durationDefault = Duration(minutes: 4).inMilliseconds;
 
 class ServerViewModel with ChangeNotifier {
   List<Continent> _continents = [
@@ -31,12 +36,25 @@ class ServerViewModel with ChangeNotifier {
     return value;
   }
 
-  List<int> get amountTerritoriesPerUser {
+  List<int> get amountSoldiersPerUser {
     List<int> list = List.filled(_users.length, 0);
     for (int i = 0; i < _users.length; i++) {
       int amount = 0;
       for (Territory territory in territories) {
         if (territory.userId == users[i].id) amount += territory.amountSoldiers;
+      }
+
+      list[i] = amount;
+    }
+    return list;
+  }
+
+  List<int> get amountTerritoriesPerUser {
+    List<int> list = List.filled(_users.length, 0);
+    for (int i = 0; i < _users.length; i++) {
+      int amount = 0;
+      for (Territory territory in territories) {
+        if (territory.userId == users[i].id) amount++;
       }
 
       list[i] = amount;
@@ -61,17 +79,17 @@ class ServerViewModel with ChangeNotifier {
 
   List<User> _users = [
     User(
-      id: 0,
-      email: '',
-      name: 'Hugo',
-      objective: Objective(id: 0, name: 'nao sei'),
-    ),
+        id: 0,
+        email: '',
+        name: 'Hugo',
+        objective: Objective(id: 0, name: 'nao sei'),
+        soldiers: 0),
     User(
-      id: 1,
-      email: '',
-      name: 'Mayara',
-      objective: Objective(id: 0, name: 'nao sei'),
-    ),
+        id: 1,
+        email: '',
+        name: 'Mayara',
+        objective: Objective(id: 0, name: 'nao sei'),
+        soldiers: 0),
   ];
 
   List<User> get users => _users;
@@ -85,10 +103,10 @@ class ServerViewModel with ChangeNotifier {
   Territory? _territorySelected;
   Territory? get territory => _territorySelected;
 
-  int _currentTime = 18000;
+  int _currentTime = _durationDefault;
   int get currentTime => _currentTime;
 
-  int get progressTimer => ((_currentTime * 100) / 18000).round();
+  int get progressTimer => ((_currentTime * 100) / _durationDefault).round();
 
   bool _disposed = false;
 
@@ -123,7 +141,7 @@ class ServerViewModel with ChangeNotifier {
     _continents[getIndexOfContinent(territory.id)]
         .territories
         .firstWhere((item) => item.id == territory.id)
-        .amountSoldiers = 1;
+        .amountSoldiers = 100;
     notifyListeners();
   }
 
@@ -134,27 +152,40 @@ class ServerViewModel with ChangeNotifier {
     }
   }
 
-  attack(Territory territory, User user) {
-    if (_userSelected!.id != _me!.id) return;
+  bool attack(Territory territory, int userId) {
+    if (_userSelected!.id != _me!.id) {
+      ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
+        SnackbarError(text: 'Não esta na sua vez'),
+      );
+      return false;
+    }
 
     if (_territorySelected == null && territory.userId != _userSelected!.id)
-      return;
+      return false;
 
+    //se o territorio é do usuario  e é o usuario atual a atacar
     if ((_territorySelected == null && territory.userId == _userSelected!.id) ||
-        _territorySelected!.userId == user.id) {
+        _territorySelected!.userId == userId) {
       changeSelectTerritory(territory);
-      return;
+      return false;
     }
-
+    //se o territorio selecionado que quer usar para atacar tiver apenas 1 soldado
     if (_territorySelected!.amountSoldiers == 1) {
       changeSelectTerritory(null);
-      return;
+      return false;
     }
 
-    realizeAttack(territory);
+    //verifica se é um vizinho atacavel
+    if (!_territorySelected!.neighbors.contains(territory.id)) {
+      ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
+          SnackbarError(text: 'Este territorio não é um vizinho atacavel'));
+      return false;
+    }
+
+    return realizeAttack(territory);
   }
 
-  realizeAttack(Territory territory) {
+  bool realizeAttack(Territory territory) {
     //verifica quantos podem atacar, ate no maximo 3, mas mantendo 1 como dono do territorio
     int amountAtack = _territorySelected!.amountSoldiers > 3
         ? 3
@@ -173,17 +204,38 @@ class ServerViewModel with ChangeNotifier {
     int lostDefense = 0;
     int lostAttack = 0;
     for (int value in attackSorted) {
-      if (value > defenseSorted[position])
-        lostDefense++;
-      else
-        lostAttack++;
+      if (position <= defenseSorted.length - 1) {
+        if (value > defenseSorted[position])
+          lostDefense++;
+        else
+          lostAttack++;
 
-      position++;
+        position++;
+      }
     }
     print(lostAttack);
     print(lostDefense);
+    if (lostDefense >= territory.amountSoldiers) {
+      changeTerritoryUser(territory.id);
+      changeAmountSoldiers(lostAttack + 1, _territorySelected!);
+      return true;
+    }
+
     changeAmountSoldiers(lostDefense, territory);
     changeAmountSoldiers(lostAttack, _territorySelected!);
+    return false;
+  }
+
+  changeTerritoryUser(int territoryId) {
+    Territory t = _continents
+        .firstWhere(
+            (element) => element.territories.any((t) => t.id == territoryId))
+        .territories
+        .firstWhere((element) => element.id == territoryId);
+    t.userId = _userSelected!.id;
+    t.amountSoldiers = 1;
+    _territorySelected!.amountSoldiers--;
+    notifyListeners();
   }
 
   changeAmountSoldiers(int amount, Territory territory) {
@@ -195,6 +247,7 @@ class ServerViewModel with ChangeNotifier {
   }
 
   changeSelectUser(User? value) {
+    if (value != null) value.soldiers = 4;
     _userSelected = value;
     notifyListeners();
   }
@@ -227,7 +280,7 @@ class ServerViewModel with ChangeNotifier {
         notifyListeners();
       } else {
         getNextUser();
-        _currentTime = 18000;
+        _currentTime = _durationDefault;
         notifyListeners();
       }
     });
