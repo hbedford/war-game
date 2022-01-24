@@ -18,4 +18,9 @@ class User {
         email: map['email'],
         soldiers: 0,
       );
+  Map<String, dynamic> get toMap => {
+        'id': id,
+        'name': name,
+        'email': email,
+      };
 }

@@ -5,7 +5,6 @@ import 'package:war/src/screens/login/login_screen.dart';
 import 'package:war/src/screens/server/server_screen.dart';
 
 import 'screens/lobby/lobby_screen.dart';
-import 'views/login/login_viewmodel.dart';
 import 'views/server/server_viewmodel.dart';
 
 class App extends StatelessWidget {
@@ -15,10 +14,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => LoginViewModel()),
         ChangeNotifierProvider(
           create: (_) => ServerViewModel(),
-        )
+        ),
       ],
       child: MaterialApp(
         theme: ThemeData(brightness: Brightness.dark),

@@ -5,7 +5,6 @@ import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/views/lobby/lobby_viewmodel.dart';
-import 'package:war/src/views/login/login_viewmodel.dart';
 import 'package:war/src/views/server/server_viewmodel.dart';
 import 'package:war/src/widgets/snackbar_error.dart';
 
@@ -17,10 +16,8 @@ class LobbyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProxyProvider<LoginViewModel, LobbyViewModel>(
+    return ChangeNotifierProvider<LobbyViewModel>(
       create: (_) => LobbyViewModel()..loadServer(),
-      update: (_, loginViewModel, lobbyViewModel) =>
-          lobbyViewModel!..updateUser(loginViewModel.user),
       child: Consumer<LobbyViewModel>(
         builder: (_, provider, child) => Padding(
           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.1),
@@ -89,7 +86,15 @@ class LobbyView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Servidores criados'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Servidores criados'),
+                        TextButton(
+                            onPressed: provider.deslogar,
+                            child: Text('Deslogar')),
+                      ],
+                    ),
                     Row(
                       children: [
                         SizedBox(
