@@ -24,9 +24,10 @@ class TerritoryItemWidget extends StatelessWidget {
                 (GetCorrectTerritory.get(territory.id).offset.dy / 100),
             left: MediaQuery.of(context).size.width *
                 (GetCorrectTerritory.get(territory.id).offset.dx / 100),
-            child: Stack(
-              children: [
-                InkWell(
+            child: Container(
+              color: Colors.red,
+              child: Center(
+                child: InkWell(
                   onTap: onTap,
                   child: Column(
                     children: [
@@ -45,16 +46,19 @@ class TerritoryItemWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                territory.id == 12
-                    ? Positioned(
-                        child: SvgPicture.asset(
-                        'assets/territories/brazil.svg',
-                        color: Colors.blue,
-                        width: MediaQuery.of(context).size.width * 0.127,
-                      ))
-                    : SizedBox(),
-              ],
+              ),
             ),
+            // territory.id == 12
+            //     ? Positioned(
+            //         child: SizedBox(
+            //         width: MediaQuery.of(context).size.width * 0.13,
+            //         height: MediaQuery.of(context).size.height * 0.23,
+            //         child: SvgPicture.asset(
+            //           'assets/territories/brazil.svg',
+            //           color: Colors.blue,
+            //         ),
+            //       ))
+            //     : SizedBox(),
           );
   }
 }

@@ -21,6 +21,7 @@ class App extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+        theme: ThemeData(brightness: Brightness.dark),
         navigatorKey: navigationApp,
         initialRoute: '/login',
         routes: {

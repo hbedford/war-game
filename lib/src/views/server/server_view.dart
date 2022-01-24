@@ -42,7 +42,15 @@ class ServerView extends StatelessWidget {
                       Text(
                         provider.userSelected!.name,
                         style: TextStyle(color: Colors.white),
-                      )
+                      ),
+                      Text(
+                        'soldados a ser adicionado',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        '${provider.userSelected?.soldiers}',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ],
                   ),
                   Row(
@@ -50,8 +58,11 @@ class ServerView extends StatelessWidget {
                     children: provider.users
                         .map<Widget>((user) => UserInfoWidget(
                               user: user,
-                              amountSoldiers: provider.amountTerritoriesPerUser[
+                              amountSoldiers: provider.amountSoldiersPerUser[
                                   provider.users.indexOf(user)],
+                              amountTerritories:
+                                  provider.amountTerritoriesPerUser[
+                                      provider.users.indexOf(user)],
                             ))
                         .toList(),
                   ),
@@ -69,30 +80,28 @@ class ServerView extends StatelessWidget {
               ),
             ),
             Stack(
-              fit: StackFit.expand,
               children: provider.territories
                   .map<Widget>((territory) => TerritoryItemWidget(
-                        onTap: () => provider.attack(
-                            territory,
-                            provider.users.firstWhere(
-                                (user) => user.id == territory.userId)),
-                        territory: territory,
-                        user: provider.users
-                            .firstWhere((user) => user.id == territory.userId),
-                      ))
+                      onTap: () =>
+                          provider.attack(territory, territory.userId!),
+                      territory: territory,
+                      user: provider.users.firstWhere(
+                          (element) => element.id == territory.userId)))
                   .toList(),
             ),
-            GestureDetector(
-              onTapDown: (details) {
-                print(getList(context, false, details.localPosition.dx));
-                print(getList(context, true, details.globalPosition.dy));
-              },
-              child: Container(
-                color: Colors.transparent,
-                height: double.infinity,
-                width: double.infinity,
-              ),
-            ),
+            // GestureDetector(
+            //   onTapDown: (details) {
+
+            //     // print(getList(context, false, details.localPosition.dx));
+            //     // print(getList(context, true, details.globalPosition.dy));
+            //   },
+            //   child: Container(
+            // Container(
+            //   color: Colors.transparent,
+            //   height: double.infinity,
+            //   width: double.infinity,
+            //   // ),
+            // ),
           ],
         );
       },

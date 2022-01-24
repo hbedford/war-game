@@ -20,7 +20,10 @@ class _LoginViewState extends State<LoginView> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(provider.isRegistering ? 'Registrar Email' : 'Logar'),
+            Text(
+              provider.isRegistering ? 'Registrar Email' : 'Logar',
+              style: TextStyle(color: Colors.white),
+            ),
             AnimatedOpacity(
               opacity: provider.isRegistering ? 1 : 0,
               duration: Duration(seconds: 1),
