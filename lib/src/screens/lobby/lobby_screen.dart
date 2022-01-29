@@ -7,7 +7,12 @@ class LobbyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: LobbyView(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: LobbyView(),
+        ),
+      ),
     );
   }
 }

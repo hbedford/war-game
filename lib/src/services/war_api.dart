@@ -78,13 +78,23 @@ class WARAPI {
     return await hasuraConnect.mutation(graphql.openServer(user.id));
   }
 
-  Future<ResultLR<Failure, bool>> startGame(int serverId, int userId) async {
+  Future<ResultLR<Failure, bool>> startGame(int serverId) async {
     ServerGraphQL graphql = ServerGraphQL();
     Map<String, dynamic> result =
         await hasuraConnect.mutation(graphql.startGame(serverId));
     if (result['data'] != null) {
       return Right((result['data']['update_server']['affected_rows'] > 0));
     }
+    return Left(Failure(0, ''));
+  }
+
+  Future<ResultLR<Failure, bool>> connectToServer(
+      int serverId, int userId) async {
+    ServerGraphQL graphQL = ServerGraphQL();
+    Map<String, dynamic> result =
+        await hasuraConnect.mutation(graphQL.connectToServer(serverId, userId));
+    if (result['data'] != null)
+      return Right(result['data']['insert_server_users']['affected_rows'] > 0);
     return Left(Failure(0, ''));
   }
 }

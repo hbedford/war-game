@@ -17,7 +17,7 @@ class UserListTileWidget extends StatelessWidget {
       height: 50,
       width: double.infinity,
       child: Row(children: [
-        Text('${index + 1}'),
+        Text('${index + 1} - '),
         Text('${user?.name ?? 'Vaga disponivel'}'),
       ]),
     );

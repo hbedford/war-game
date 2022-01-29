@@ -32,8 +32,8 @@ class Server {
       thirdUserId: map['third_user_id'],
       fourthUserId: map['fourth_user_id'],
       isStarted: map['isstarted'],
-      amountUsers: map['user']['server_users_aggregate']['aggregate']['count'],
-      users: map['user']['server_users']
+      amountUsers: map['server_users_aggregate']['aggregate']['count'],
+      users: map['server_users']
           .map<User>((map) => User.fromJson(map['user']))
           .toList());
 }

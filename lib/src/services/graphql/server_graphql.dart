@@ -10,18 +10,16 @@ class ServerGraphQL {
             name
           }
           isstarted
-          user {
-            server_users_aggregate {
-              aggregate {
-                count
-              }
+          server_users {
+            user {
+              id
+              name
+            email
             }
-            server_users {
-              user {
-                id
-                name
-                email
-              }
+          }
+          server_users_aggregate {
+            aggregate {
+              count
             }
           }
         }
@@ -45,24 +43,31 @@ class ServerGraphQL {
         fourth_user_id
         selected_user_id
         isstarted
-        user {
-
-          id
-          name
-          email
-          server_users_aggregate {
-            aggregate {
-              count
-            }
-          }
-          server_users {
+        server_users {
             user {
               id
               name
               email
             }
           }
+        user {
+          id
+          name
+          email
+        }
+        server_users_aggregate {
+          aggregate {
+            count
+          }
         }
       }
     }""";
+
+  String connectToServer(int serverId, int userId) => """
+  mutation MyMutation {
+    insert_server_users(objects: {server_id: $serverId, user_id: $userId}) {
+      affected_rows
+    }
+  }
+  """;
 }

@@ -12,8 +12,9 @@ class LobbyServersView extends StatelessWidget {
     return Consumer<LobbyViewModel>(
       builder: (_, provider, __) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -24,6 +25,7 @@ class LobbyServersView extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 8),
           Row(
             children: [
               SizedBox(
@@ -44,7 +46,7 @@ class LobbyServersView extends StatelessWidget {
                             itemCount: provider.servers.length,
                             itemBuilder: (context, int index) => InkWell(
                               onTap: () => provider
-                                  .changeServer(provider.servers[index]),
+                                  .connectToServer(provider.servers[index]),
                               child: ServerListTileWidget(
                                 index: index,
                                 server: provider.servers[index],

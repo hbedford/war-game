@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:war/src/models/failure/failure.dart';
@@ -37,8 +36,8 @@ class CreationServerView extends StatelessWidget {
                     itemCount: provider.totalUsers,
                     itemBuilder: (context, int index) => UserListTileWidget(
                       index: index,
-                      user: provider.users.length < index
-                          ? provider.users[index]
+                      user: provider.server!.users.length > index
+                          ? provider.server!.users[index]
                           : null,
                     ),
                   ),
@@ -50,20 +49,28 @@ class CreationServerView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Consumer<ServerViewModel>(
-                builder: (_, serverProvider, child) => CupertinoButton.filled(
-                  child: Text('Iniciar'),
-                  onPressed: () async {
-                    ResultLR<Failure, bool> result = await provider.startGame();
-                    if (result.isRight()) {
-                      serverProvider.start();
-                      serverProvider.updateServer(provider.server);
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/server', (route) => false);
-                      return;
-                    }
-                    ScaffoldMessenger.of(context).showSnackBar(SnackbarError(
-                        text: ((result as Left).value as Failure).error));
-                  },
+                builder: (_, serverProvider, child) => Container(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                  decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(provider.isHost ? 1 : 0.2),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: InkWell(
+                    child:
+                        Text(provider.isHost ? 'Iniciar' : 'Aguardando inicio'),
+                    onTap: () async {
+                      ResultLR<Failure, bool> result =
+                          await provider.startGame();
+                      if (result.isRight()) {
+                        serverProvider.start();
+                        serverProvider.updateServer(provider.server);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/server', (route) => false);
+                        return;
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(SnackbarError(
+                          text: ((result as Left).value as Failure).error));
+                    },
+                  ),
                 ),
               ),
             ],
