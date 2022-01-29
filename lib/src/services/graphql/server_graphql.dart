@@ -1,7 +1,7 @@
 class ServerGraphQL {
   String openServer(int userId) => """
     mutation MyMutation {
-      insert_server(objects: {host_user_id: $userId}) {
+      insert_server(objects: {host_user_id: $userId, server_user: {data: {user_id: $userId}}}) {
         returning {
           id
           user {
@@ -39,11 +39,6 @@ class ServerGraphQL {
     subscription MySubscription {
       server {
         id
-        user {
-          id
-          name
-          email
-        }
         first_user_id
         second_user_id
         third_user_id
@@ -51,6 +46,10 @@ class ServerGraphQL {
         selected_user_id
         isstarted
         user {
+
+          id
+          name
+          email
           server_users_aggregate {
             aggregate {
               count

@@ -30,6 +30,7 @@ class LobbyViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   bool _disposed = false;
+  int get totalUsers => 5;
 
   updateUser(User? value) {
     changeUser(value);
