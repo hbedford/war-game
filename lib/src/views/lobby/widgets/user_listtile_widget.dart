@@ -8,14 +8,18 @@ class UserListTileWidget extends StatelessWidget {
   const UserListTileWidget({
     Key? key,
     required this.index,
-    required this.user,
+    this.user,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Text('${index + 1}'),
-      title: Text('${user != null ? user!.name : 'vaga disponivel'}'),
+    return Container(
+      height: 50,
+      width: double.infinity,
+      child: Row(children: [
+        Text('${index + 1} - '),
+        Text('${user?.name ?? 'Vaga disponivel'}'),
+      ]),
     );
   }
 }

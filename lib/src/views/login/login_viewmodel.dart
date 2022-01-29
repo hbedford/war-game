@@ -64,7 +64,7 @@ class LoginViewModel with ChangeNotifier {
       return;
     }
     changeIsLoading(true);
-    var result = await api.getLogin(_email);
+    var result = await api.getLogin(_email.toLowerCase());
     List<User> list = result['data']['user']
         .map<User>((item) => User.fromJson(item))
         .toList();
@@ -103,7 +103,7 @@ class LoginViewModel with ChangeNotifier {
       changeIsLoading(true);
       var result = await api.registerLogin(_email, _name);
       List<User> list = result['data']['insert_user']['returning']
-          .map((item) => User.fromJson(item))
+          .map<User>((item) => User.fromJson(item))
           .toList();
       if (list.isEmpty) {
         changeIsLoading(false);

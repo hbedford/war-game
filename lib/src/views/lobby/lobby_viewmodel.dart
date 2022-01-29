@@ -23,13 +23,12 @@ class LobbyViewModel with ChangeNotifier {
   User? _user;
   User? get user => _user;
 
-  List<User?> _users = List.filled(5, null);
-  List<User?> get users => _users;
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   bool _disposed = false;
+  int get totalUsers => 5;
+  bool get isHost => _server != null && _server!.hostUser.id == _user!.id;
 
   updateUser(User? value) {
     changeUser(value);
@@ -45,15 +44,19 @@ class LobbyViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  loadServer() async {
+  loadServers() async {
     changeIsLoading(true);
     User user = User.fromJson(jsonDecode(_getStorage.read('user')));
+    changeUser(user);
     Snapshot snapshot = await api.listenServer();
     snapshot.listen((result) {
-      _servers = result['data']['server']
+      changeServers(result['data']['server']
           .map<Server>((item) => Server.fromJson(item))
-          .toList();
-      notifyListeners();
+          .toList());
+
+      if (_server != null) {
+        changeServer(_servers.firstWhere((s) => s.id == _server!.id));
+      }
       changeIsLoading(false);
     });
   }
@@ -68,22 +71,37 @@ class LobbyViewModel with ChangeNotifier {
     Map<String, dynamic> result = await api.openServer(_user!);
     _server =
         Server.fromJson(result['data']['insert_server']['returning'].first);
-    _users[0] = _user;
+    notifyListeners();
+  }
+
+  changeServer(Server? value) {
+    _server = value;
+    notifyListeners();
+  }
+
+  changeServers(List<Server> value) {
+    _servers = value;
     notifyListeners();
   }
 
   getOutServer() {
     _server = null;
-    _users = List.filled(5, null);
     notifyListeners();
   }
 
-  Future<ResultLR<Failure, Server>> startGame() async {
+  Future<ResultLR<Failure, bool>> startGame() async {
     changeIsLoading(true);
-    ResultLR<Failure, Server> result =
-        await api.startGame(_server!.id, _user!.id);
+    ResultLR<Failure, bool> result = await api.startGame(_server!.id);
     if (result.isLeft()) changeIsLoading(false);
     return result;
+  }
+
+  connectToServer(Server value) async {
+    ResultLR<Failure, bool> result =
+        await api.connectToServer(value.id, _user!.id);
+    if (result.isRight()) {
+      changeServer(_servers.firstWhere((element) => element.id == value.id));
+    }
   }
 
   @override
