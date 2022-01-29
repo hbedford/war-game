@@ -41,23 +41,8 @@ class WARAPI {
   }
 
   Future<Snapshot> listenServer() async {
-    return await hasuraConnect.subscription(""" 
-    subscription MySubscription {
-      server {
-        id
-        user {
-          id
-          name
-          email
-        }
-        first_user_id
-        second_user_id
-        third_user_id
-        fourth_user_id
-        selected_user_id
-        isstarted
-      }
-    }""");
+    ServerGraphQL graphQL = ServerGraphQL();
+    return await hasuraConnect.subscription(graphQL.listenServers);
   }
 
   Future<Map<String, dynamic>> getLogin(String email) async {
@@ -93,13 +78,12 @@ class WARAPI {
     return await hasuraConnect.mutation(graphql.openServer(user.id));
   }
 
-  Future<ResultLR<Failure, Server>> startGame(int serverId, int userId) async {
+  Future<ResultLR<Failure, bool>> startGame(int serverId, int userId) async {
     ServerGraphQL graphql = ServerGraphQL();
     Map<String, dynamic> result =
-        await hasuraConnect.mutation(graphql.startGame(serverId, userId));
+        await hasuraConnect.mutation(graphql.startGame(serverId));
     if (result['data'] != null) {
-      return Right(
-          Server.fromJson(result['data']['update_server']['returning'].first));
+      return Right((result['data']['update_server']['affected_rows'] > 0));
     }
     return Left(Failure(0, ''));
   }

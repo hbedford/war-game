@@ -64,7 +64,7 @@ class LoginViewModel with ChangeNotifier {
       return;
     }
     changeIsLoading(true);
-    var result = await api.getLogin(_email);
+    var result = await api.getLogin(_email.toLowerCase());
     List<User> list = result['data']['user']
         .map<User>((item) => User.fromJson(item))
         .toList();

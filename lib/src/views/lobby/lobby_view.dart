@@ -17,7 +17,7 @@ class LobbyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<LobbyViewModel>(
-      create: (_) => LobbyViewModel()..loadServer(),
+      create: (_) => LobbyViewModel()..loadServers(),
       child: Consumer<LobbyViewModel>(
         builder: (_, provider, child) => Padding(
           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.1),
@@ -44,10 +44,13 @@ class LobbyView extends StatelessWidget {
                           height: MediaQuery.of(context).size.height * 0.4,
                           child: ListView.builder(
                             itemCount: provider.users.length,
-                            itemBuilder: (context, int index) =>
-                                UserListTileWidget(
-                              index: index,
-                              user: provider.users[index],
+                            itemBuilder: (context, int index) => InkWell(
+                              onTap: () => provider
+                                  .changeServer(provider.servers[index]),
+                              child: UserListTileWidget(
+                                index: index,
+                                user: provider.servers[index].hostUser,
+                              ),
                             ),
                           ),
                         ),
@@ -61,12 +64,11 @@ class LobbyView extends StatelessWidget {
                               CupertinoButton.filled(
                             child: Text('Iniciar'),
                             onPressed: () async {
-                              ResultLR<Failure, Server> result =
+                              ResultLR<Failure, bool> result =
                                   await provider.startGame();
                               if (result.isRight()) {
                                 serverProvider.start();
-                                serverProvider
-                                    .updateServer((result as Right).value);
+                                serverProvider.updateServer(provider.server);
                                 Navigator.pushNamedAndRemoveUntil(
                                     context, '/server', (route) => false);
                                 return;
@@ -101,7 +103,7 @@ class LobbyView extends StatelessWidget {
                           width: 25,
                         ),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
+                          width: MediaQuery.of(context).size.width * 0.7,
                           height: MediaQuery.of(context).size.height * 0.4,
                           child: provider.isLoading
                               ? Center(
@@ -117,6 +119,8 @@ class LobbyView extends StatelessWidget {
                                           ServerListTileWidget(
                                         index: index,
                                         server: provider.servers[index],
+                                        amountUsers:
+                                            provider.servers[index].amountUsers,
                                       ),
                                     ),
                         ),

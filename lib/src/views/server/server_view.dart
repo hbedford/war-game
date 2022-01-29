@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:war/src/views/server/server_viewmodel.dart';
 import 'package:war/src/widgets/territory_item_widget.dart';
@@ -15,10 +14,6 @@ class ServerView extends StatelessWidget {
       (position * 3);
   @override
   Widget build(BuildContext context) {
-    /*   SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]); */
     return Consumer<ServerViewModel>(
       builder: (_, provider, child) {
         return Stack(

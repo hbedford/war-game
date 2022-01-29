@@ -10,31 +10,60 @@ class ServerGraphQL {
             name
           }
           isstarted
-        }
-      }
-    }
-    """;
-  String startGame(int serverId, int userId) => """
-    mutation MyMutation {
-      update_server(where: {id: {_eq: ${serverId}}, host_user_id: {_eq: ${userId}}}, _set: {stats: 2,isstarted:true}) {
-        affected_rows
-        returning {
-          id
           user {
-            id
-            name
-            email
+            server_users_aggregate {
+              aggregate {
+                count
+              }
+            }
+            server_users {
+              user {
+                id
+                name
+                email
+              }
+            }
           }
-          first_user_id
-          second_user_id
-          third_user_id
-          fourth_user_id
-          selected_user_id
-          stats
-          updated_at
-          isstarted
         }
       }
     }
     """;
+  String startGame(int serverId) => """
+  mutation MyMutation {
+    update_server(where: {id: {_eq: 10}}, _set: {isstarted: true}) {
+      affected_rows
+    }
+  }
+  """;
+  String get listenServers => """ 
+    subscription MySubscription {
+      server {
+        id
+        user {
+          id
+          name
+          email
+        }
+        first_user_id
+        second_user_id
+        third_user_id
+        fourth_user_id
+        selected_user_id
+        isstarted
+        user {
+          server_users_aggregate {
+            aggregate {
+              count
+            }
+          }
+          server_users {
+            user {
+              id
+              name
+              email
+            }
+          }
+        }
+      }
+    }""";
 }

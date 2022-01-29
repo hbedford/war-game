@@ -45,14 +45,17 @@ class LobbyViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  loadServer() async {
+  loadServers() async {
     changeIsLoading(true);
     User user = User.fromJson(jsonDecode(_getStorage.read('user')));
+    changeUser(user);
     Snapshot snapshot = await api.listenServer();
     snapshot.listen((result) {
       _servers = result['data']['server']
           .map<Server>((item) => Server.fromJson(item))
           .toList();
+      if (_server != null)
+        changeServer(_servers.firstWhere((s) => s.id == _server!.id));
       notifyListeners();
       changeIsLoading(false);
     });
@@ -72,15 +75,20 @@ class LobbyViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  changeServer(Server? value) {
+    _server = value;
+    notifyListeners();
+  }
+
   getOutServer() {
     _server = null;
     _users = List.filled(5, null);
     notifyListeners();
   }
 
-  Future<ResultLR<Failure, Server>> startGame() async {
+  Future<ResultLR<Failure, bool>> startGame() async {
     changeIsLoading(true);
-    ResultLR<Failure, Server> result =
+    ResultLR<Failure, bool> result =
         await api.startGame(_server!.id, _user!.id);
     if (result.isLeft()) changeIsLoading(false);
     return result;
