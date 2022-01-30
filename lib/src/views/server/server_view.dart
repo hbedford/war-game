@@ -85,6 +85,14 @@ class ServerView extends StatelessWidget {
                           (element) => element.id == territory.userId)))
                   .toList(),
             ),
+
+            Positioned(
+                top: 10,
+                right: 20,
+                child: IconButton(
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/lobby'),
+                    icon: Icon(Icons.logout)))
             // GestureDetector(
             //   onTapDown: (details) {
 

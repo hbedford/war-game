@@ -3,12 +3,14 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:provider/provider.dart';
 import 'package:war/main.dart';
 import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/services/war_api.dart';
+import 'package:war/src/views/server/server_viewmodel.dart';
 
 class LobbyViewModel with ChangeNotifier {
   GetStorage _getStorage = GetStorage();
@@ -56,6 +58,15 @@ class LobbyViewModel with ChangeNotifier {
 
       if (_server != null) {
         changeServer(_servers.firstWhere((s) => s.id == _server!.id));
+        if (!_server!.isLoading &&
+            _server!.isStarted &&
+            _user!.id != _server!.hostUser.id) {
+          final serverProvider =
+              Provider.of<ServerViewModel>(navigationApp.currentContext!);
+          serverProvider.updateServer(_server!, false);
+          Navigator.pushNamedAndRemoveUntil(
+              navigationApp.currentContext!, '/server', (route) => false);
+        }
       }
       changeIsLoading(false);
     });

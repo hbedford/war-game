@@ -20,4 +20,11 @@ class Continent {
         bonus: map['bonus'],
       );
   int get length => territories.length;
+  Map<String, dynamic> get toMap => {
+        'id': id,
+        'name': name,
+        'territories': territories
+            .map<Map<String, dynamic>>((territory) => territory.toMap)
+            .toList(),
+      };
 }

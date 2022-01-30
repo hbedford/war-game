@@ -61,7 +61,7 @@ class CreationServerView extends StatelessWidget {
                       ResultLR<Failure, bool> result =
                           await provider.startGame();
                       if (result.isRight()) {
-                        serverProvider.updateServer(provider.server!);
+                        serverProvider.updateServer(provider.server!, true);
                         Navigator.pushNamedAndRemoveUntil(
                             context, '/server', (route) => false);
                         return;

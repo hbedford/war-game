@@ -22,13 +22,14 @@ class ServerGraphQL {
               count
             }
           }
+          isloading
         }
       }
     }
     """;
   String startGame(int serverId) => """
   mutation MyMutation {
-    update_server(where: {id: {_eq: 10}}, _set: {isstarted: true}) {
+    update_server(where: {id: {_eq: 10}}, _set: {isstarted: true,isloading:true}) {
       affected_rows
     }
   }
@@ -60,6 +61,7 @@ class ServerGraphQL {
             count
           }
         }
+        isloading
       }
     }""";
 
@@ -78,6 +80,7 @@ class ServerGraphQL {
         territories {
           id
           name
+          server_id
           amountsoldiers
           offset
           user_id
@@ -87,4 +90,11 @@ class ServerGraphQL {
       }
     }
   """;
+  String get addTerritories => """
+    mutation MyMutation(\$objects:[territory_insert_input!]!) {
+      insert_territory(objects:\$objects ) {
+        affected_rows
+      }
+    }
+    """;
 }

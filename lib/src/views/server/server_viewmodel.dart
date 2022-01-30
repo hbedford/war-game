@@ -7,12 +7,10 @@ import 'package:get_storage/get_storage.dart';
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:war/main.dart';
 import 'package:war/src/models/continents/continent.dart';
-import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/data_info.dart';
-import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/services/war_api.dart';
 import 'package:war/src/widgets/snackbar_error.dart';
 
@@ -104,11 +102,11 @@ class ServerViewModel with ChangeNotifier {
   Server? _server;
   Server? get server => _server;
 
-  startGame() {
+  startGame() async {
     randomizePlayers();
     changeSelectUser(_users.first);
 
-    loadTerritories();
+    await loadTerritories();
     timer();
   }
 
@@ -119,16 +117,23 @@ class ServerViewModel with ChangeNotifier {
     _userSelected = list.first;
   }
 
-  loadTerritories() {
+  Future loadTerritories() async {
+    List<Territory> list = [];
     int indexUser = 0;
     while (territoriesWithoutUser.length > 0) {
       Territory territory = (territoriesWithoutUser..shuffle()).first;
-      addUserOnTerritory(territory, indexUser);
+      territory.amountSoldiers = 1;
+      territory.userId = users[indexUser].id;
+      territory.serverId = _server!.id;
+      list.add(territory);
+      // addUserOnTerritory(territory, indexUser);
       if (indexUser + 1 == _users.length)
         indexUser = 0;
       else
         indexUser++;
     }
+
+    await _api.addTerritories(list);
   }
 
   getUser() {
@@ -158,12 +163,12 @@ class ServerViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  updateServer(Server value) async {
+  updateServer(Server value, bool isHost) async {
     changeServer(value);
     Snapshot game = await _api.game(value.id);
-    startGame();
+    if (isHost) startGame();
     game.listen((resultGame) {
-      _continents = resultGame['data']['continents']
+      _continents = resultGame['data']['continent']
           .map<Continent>((continent) => Continent.fromJson(continent))
           .toList();
     });
@@ -330,13 +335,13 @@ class ServerViewModel with ChangeNotifier {
       changeSelectUser(_users[index + 1]);
   }
 
-  addTerritories() async {
-    print('ola');
-    WARAPI api = WARAPI();
-    var result = await api.addContinents(
-        territories.map<Map<String, dynamic>>((e) => e.toMap).toList());
-    print(result);
-  }
+  // addTerritories() async {
+  //   print('ola');
+  //   WARAPI api = WARAPI();
+  //   var result = await api.addContinents(
+  //       territories.map<Map<String, dynamic>>((e) => e.toMap).toList());
+  //   print(result);
+  // }
 
   @override
   void dispose() {

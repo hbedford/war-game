@@ -1,6 +1,8 @@
 import 'package:hasura_connect/hasura_connect.dart';
+import 'package:war/src/models/continents/continent.dart';
 import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
+import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/resultlr.dart';
 
@@ -15,16 +17,23 @@ class WARAPI {
     return await hasuraConnect.subscription(graphQL.game(serverId));
   }
 
-  Future<dynamic> addContinents(List<Map<String, dynamic>> list) async {
-    print(list);
-    return await hasuraConnect.mutation("""
-     mutation MyMutation(\$objects:[territory_insert_input!]!) {
-  insert_territory(objects:\$objects ) {
-    affected_rows
+  Future addTerritories(List<Territory> territories) async {
+    ServerGraphQL graphQL = ServerGraphQL();
+    await hasuraConnect.mutation(graphQL.addTerritories, variables: {
+      'objects': territories.map((territory) => territory.toMap).toList()
+    });
   }
-}
-    """, variables: {'objects': list}).catchError((e) => print(e));
-  }
+
+//   Future<dynamic> addContinents(List<Map<String, dynamic>> list) async {
+//     print(list);
+//     return await hasuraConnect.mutation("""
+//      mutation MyMutation(\$objects:[territory_insert_input!]!) {
+//   insert_territory(objects:\$objects ) {
+//     affected_rows
+//   }
+// }
+//     """, variables: {'objects': list}).catchError((e) => print(e));
+//   }
 
   Future<Snapshot> listenServer() async {
     ServerGraphQL graphQL = ServerGraphQL();
