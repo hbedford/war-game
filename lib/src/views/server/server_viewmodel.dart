@@ -134,6 +134,7 @@ class ServerViewModel with ChangeNotifier {
     }
 
     await _api.addTerritories(list);
+    await _api.loadedGame(_server!.id);
   }
 
   getUser() {
@@ -166,11 +167,22 @@ class ServerViewModel with ChangeNotifier {
   updateServer(Server value, bool isHost) async {
     changeServer(value);
     Snapshot game = await _api.game(value.id);
+    Snapshot serverSnapshot = await _api.listenServer(value.id);
     if (isHost) startGame();
     game.listen((resultGame) {
       _continents = resultGame['data']['continent']
           .map<Continent>((continent) => Continent.fromJson(continent))
           .toList();
+    });
+    serverSnapshot.listen((resultServer) {
+      Server result = resultServer['data']['server']
+          .map<Server>((v) => Server.fromJson(v))
+          .toList()
+          .first;
+      changeServer(result);
+      changeUsers(result.users);
+      changeSelectUser(result.users
+          .firstWhere((element) => element.id == result.userSelectedId));
     });
   }
 

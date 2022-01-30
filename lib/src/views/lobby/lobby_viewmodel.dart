@@ -46,24 +46,32 @@ class LobbyViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  loadServers() async {
-    changeIsLoading(true);
+  getUser() {
     User user = User.fromJson(jsonDecode(_getStorage.read('user')));
     changeUser(user);
-    Snapshot snapshot = await api.listenServer();
+  }
+
+  loadServers() async {
+    changeIsLoading(true);
+    getUser();
+    Snapshot snapshot = await api.listenServers();
     snapshot.listen((result) {
-      changeServers(result['data']['server']
+      List<Server> list = result['data']['server']
           .map<Server>((item) => Server.fromJson(item))
-          .toList());
+          .toList();
+      changeServers(list);
 
       if (_server != null) {
-        changeServer(_servers.firstWhere((s) => s.id == _server!.id));
-        if (!_server!.isLoading &&
-            _server!.isStarted &&
-            _user!.id != _server!.hostUser.id) {
-          final serverProvider =
-              Provider.of<ServerViewModel>(navigationApp.currentContext!);
-          serverProvider.updateServer(_server!, false);
+        Server value = list.firstWhere((s) => s.id == _server!.id);
+        changeServer(value);
+        print(_server!.isLoading);
+        if (!value.isLoading &&
+            _user!.id != value.hostUser.id &&
+            value.isStarted) {
+          final serverProvider = Provider.of<ServerViewModel>(
+              navigationApp.currentContext!,
+              listen: false);
+          serverProvider.updateServer(value, false);
           Navigator.pushNamedAndRemoveUntil(
               navigationApp.currentContext!, '/server', (route) => false);
         }
@@ -102,7 +110,7 @@ class LobbyViewModel with ChangeNotifier {
 
   Future<ResultLR<Failure, bool>> startGame() async {
     changeIsLoading(true);
-    ResultLR<Failure, bool> result = await api.startGame(_server!.id);
+    ResultLR<Failure, bool> result = await api.loadingGame(_server!.id);
     if (result.isLeft()) changeIsLoading(false);
     return result;
   }

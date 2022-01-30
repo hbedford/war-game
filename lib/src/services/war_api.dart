@@ -1,7 +1,5 @@
 import 'package:hasura_connect/hasura_connect.dart';
-import 'package:war/src/models/continents/continent.dart';
 import 'package:war/src/models/failure/failure.dart';
-import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
 import 'package:war/src/services/resultlr.dart';
@@ -13,13 +11,11 @@ class WARAPI {
       HasuraConnect('https://game-war.herokuapp.com/v1/graphql');
 
   Future<Snapshot> game(int serverId) async {
-    ServerGraphQL graphQL = ServerGraphQL();
-    return await hasuraConnect.subscription(graphQL.game(serverId));
+    return await hasuraConnect.subscription(ServerGraphQL.game(serverId));
   }
 
   Future addTerritories(List<Territory> territories) async {
-    ServerGraphQL graphQL = ServerGraphQL();
-    await hasuraConnect.mutation(graphQL.addTerritories, variables: {
+    await hasuraConnect.mutation(ServerGraphQL.addTerritories, variables: {
       'objects': territories.map((territory) => territory.toMap).toList()
     });
   }
@@ -35,9 +31,13 @@ class WARAPI {
 //     """, variables: {'objects': list}).catchError((e) => print(e));
 //   }
 
-  Future<Snapshot> listenServer() async {
-    ServerGraphQL graphQL = ServerGraphQL();
-    return await hasuraConnect.subscription(graphQL.listenServers);
+  Future<Snapshot> listenServers() async {
+    return await hasuraConnect.subscription(ServerGraphQL.listenServers);
+  }
+
+  Future<Snapshot> listenServer(int serverId) async {
+    return await hasuraConnect
+        .subscription(ServerGraphQL.listenServer(serverId));
   }
 
   Future<Map<String, dynamic>> getLogin(String email) async {
@@ -69,14 +69,21 @@ class WARAPI {
   }
 
   Future<Map<String, dynamic>> openServer(User user) async {
-    ServerGraphQL graphql = ServerGraphQL();
-    return await hasuraConnect.mutation(graphql.openServer(user.id));
+    return await hasuraConnect.mutation(ServerGraphQL.openServer(user.id));
   }
 
-  Future<ResultLR<Failure, bool>> startGame(int serverId) async {
-    ServerGraphQL graphql = ServerGraphQL();
+  Future<ResultLR<Failure, bool>> loadingGame(int serverId) async {
     Map<String, dynamic> result =
-        await hasuraConnect.mutation(graphql.startGame(serverId));
+        await hasuraConnect.mutation(ServerGraphQL.loadingGame(serverId));
+    if (result['data'] != null) {
+      return Right((result['data']['update_server']['affected_rows'] > 0));
+    }
+    return Left(Failure(0, ''));
+  }
+
+  Future<ResultLR<Failure, bool>> loadedGame(int serverId) async {
+    Map<String, dynamic> result =
+        await hasuraConnect.mutation(ServerGraphQL.loadedGame(serverId));
     if (result['data'] != null) {
       return Right((result['data']['update_server']['affected_rows'] > 0));
     }
@@ -85,9 +92,8 @@ class WARAPI {
 
   Future<ResultLR<Failure, bool>> connectToServer(
       int serverId, int userId) async {
-    ServerGraphQL graphQL = ServerGraphQL();
-    Map<String, dynamic> result =
-        await hasuraConnect.mutation(graphQL.connectToServer(serverId, userId));
+    Map<String, dynamic> result = await hasuraConnect
+        .mutation(ServerGraphQL.connectToServer(serverId, userId));
     if (result['data'] != null)
       return Right(result['data']['insert_server_users']['affected_rows'] > 0);
     return Left(Failure(0, ''));

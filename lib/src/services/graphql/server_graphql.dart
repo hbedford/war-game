@@ -1,5 +1,6 @@
 class ServerGraphQL {
-  String openServer(int userId) => """
+  ServerGraphQL._();
+  static String openServer(int userId) => """
     mutation MyMutation {
       insert_server(objects: {host_user_id: $userId, server_user: {data: {user_id: $userId}}}) {
         returning {
@@ -27,14 +28,21 @@ class ServerGraphQL {
       }
     }
     """;
-  String startGame(int serverId) => """
+  static String loadingGame(int serverId) => """
   mutation MyMutation {
-    update_server(where: {id: {_eq: 10}}, _set: {isstarted: true,isloading:true}) {
+    update_server(where: {id: {_eq: $serverId}}, _set: {isloading:true}) {
       affected_rows
     }
   }
   """;
-  String get listenServers => """ 
+  static String loadedGame(int serverId) => """
+  mutation MyMutation {
+    update_server(where: {id: {_eq: $serverId}}, _set: {isloading:false,isstarted:true}) {
+      affected_rows
+    }
+  }
+  """;
+  static String get listenServers => """ 
     subscription MySubscription {
       server {
         id
@@ -63,16 +71,49 @@ class ServerGraphQL {
         }
         isloading
       }
-    }""";
+    }
+    """;
+  static String listenServer(int serverId) => """
+  subscription MySubscription {
+  server(where: {id: {_eq: $serverId}}) {
+    id
+    first_user_id
+    second_user_id
+    third_user_id
+    fourth_user_id
+    selected_user_id
+    isstarted
+    server_users {
+      user {
+        id
+        name
+        email
+      }
+    }
+    user {
+      id
+      name
+      email
+    }
+    server_users_aggregate {
+      aggregate {
+        count
+      }
+    }
+    isloading
+  }
+}
 
-  String connectToServer(int serverId, int userId) => """
+
+  """;
+  static String connectToServer(int serverId, int userId) => """
   mutation MyMutation {
     insert_server_users(objects: {server_id: $serverId, user_id: $userId}) {
       affected_rows
     }
   }
   """;
-  String game(int serverId) => """subscription  {
+  static String game(int serverId) => """subscription  {
       continent (where: {territories: {server_id: {_eq: $serverId}}}){
         id
         name
@@ -90,7 +131,7 @@ class ServerGraphQL {
       }
     }
   """;
-  String get addTerritories => """
+  static String get addTerritories => """
     mutation MyMutation(\$objects:[territory_insert_input!]!) {
       insert_territory(objects:\$objects ) {
         affected_rows

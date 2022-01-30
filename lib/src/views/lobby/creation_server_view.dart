@@ -13,67 +13,98 @@ class CreationServerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<LobbyViewModel>(
-      builder: (_, provider, __) => Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      builder: (_, provider, __) => Stack(
         children: [
-          Row(
-            children: [
-              TextButton(
-                onPressed: provider.getOutServer,
-                child: Icon(Icons.arrow_back_ios),
-              ),
-              Text('Lobby do server '),
-            ],
-          ),
-          Flexible(
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 25,
-                ),
-                Flexible(
-                  child: ListView.builder(
-                    itemCount: provider.totalUsers,
-                    itemBuilder: (context, int index) => UserListTileWidget(
-                      index: index,
-                      user: provider.server!.users.length > index
-                          ? provider.server!.users[index]
-                          : null,
+          Scaffold(
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        TextButton(
+                          onPressed: provider.getOutServer,
+                          child: Icon(Icons.arrow_back_ios),
+                        ),
+                        Text('Lobby do server '),
+                      ],
                     ),
-                  ),
+                    Flexible(
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 25,
+                          ),
+                          Flexible(
+                            child: ListView.builder(
+                              itemCount: provider.totalUsers,
+                              itemBuilder: (context, int index) =>
+                                  UserListTileWidget(
+                                index: index,
+                                user: provider.server!.users.length > index
+                                    ? provider.server!.users[index]
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Consumer<ServerViewModel>(
+                          builder: (_, serverProvider, child) => Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 32),
+                            decoration: BoxDecoration(
+                                color: Colors.blue
+                                    .withOpacity(provider.isHost ? 1 : 0.2),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: InkWell(
+                              child: Text(provider.isHost
+                                  ? 'Iniciar'
+                                  : 'Aguardando inicio'),
+                              onTap: () async {
+                                ResultLR<Failure, bool> result =
+                                    await provider.startGame();
+                                if (result.isRight()) {
+                                  serverProvider.updateServer(
+                                      provider.server!, true);
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/server', (route) => false);
+                                  return;
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackbarError(
+                                        text:
+                                            ((result as Left).value as Failure)
+                                                .error));
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Consumer<ServerViewModel>(
-                builder: (_, serverProvider, child) => Container(
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+          provider.server != null && provider.server!.isLoading
+              ? Container(
+                  height: double.infinity,
+                  width: double.infinity,
                   decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(provider.isHost ? 1 : 0.2),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: InkWell(
-                    child:
-                        Text(provider.isHost ? 'Iniciar' : 'Aguardando inicio'),
-                    onTap: () async {
-                      ResultLR<Failure, bool> result =
-                          await provider.startGame();
-                      if (result.isRight()) {
-                        serverProvider.updateServer(provider.server!, true);
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, '/server', (route) => false);
-                        return;
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(SnackbarError(
-                          text: ((result as Left).value as Failure).error));
-                    },
+                    color: Colors.white12,
                   ),
-                ),
-              ),
-            ],
-          ),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : SizedBox()
         ],
       ),
     );
