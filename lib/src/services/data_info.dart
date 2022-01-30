@@ -4,7 +4,7 @@ import 'package:war/src/models/territory/territory.dart';
 
 DataTerritory data = DataTerritory();
 
-class Data {
+class DataInfo {
   Continent americaDoNorte = Continent(
     id: 1,
     name: 'America do Norte',

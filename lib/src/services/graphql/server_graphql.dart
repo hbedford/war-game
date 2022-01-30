@@ -70,4 +70,21 @@ class ServerGraphQL {
     }
   }
   """;
+  String game(int serverId) => """subscription  {
+      continent (where: {territories: {server_id: {_eq: $serverId}}}){
+        id
+        name
+        bonus
+        territories {
+          id
+          name
+          amountsoldiers
+          offset
+          user_id
+          neighbors
+          continent_id
+        }
+      }
+    }
+  """;
 }

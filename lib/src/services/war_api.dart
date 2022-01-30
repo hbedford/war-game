@@ -10,23 +10,9 @@ class WARAPI {
   HasuraConnect hasuraConnect =
       HasuraConnect('https://game-war.herokuapp.com/v1/graphql');
 
-  Future<Snapshot> game() async {
-    return await hasuraConnect.subscription("""subscription  {
-      continent {
-        id
-        name
-        bonus
-        territories {
-          id
-          name
-          amountsoldiers
-          offset
-          user_id
-          neighbors
-        }
-      }
-    }
-  """);
+  Future<Snapshot> game(int serverId) async {
+    ServerGraphQL graphQL = ServerGraphQL();
+    return await hasuraConnect.subscription(graphQL.game(serverId));
   }
 
   Future<dynamic> addContinents(List<Map<String, dynamic>> list) async {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:war/src/views/server/server_viewmodel.dart';
 import 'package:war/src/widgets/territory_item_widget.dart';
 import 'package:war/src/widgets/user_info_widget.dart';
+import 'package:collection/collection.dart';
 
 class ServerView extends StatelessWidget {
   const ServerView({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class ServerView extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        provider.userSelected!.name,
+                        "${provider.userSelected?.name ?? ''}",
                         style: TextStyle(color: Colors.white),
                       ),
                       Text(
@@ -80,7 +81,7 @@ class ServerView extends StatelessWidget {
                       onTap: () =>
                           provider.attack(territory, territory.userId!),
                       territory: territory,
-                      user: provider.users.firstWhere(
+                      user: provider.users.firstWhereOrNull(
                           (element) => element.id == territory.userId)))
                   .toList(),
             ),

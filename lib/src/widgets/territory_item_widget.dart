@@ -6,7 +6,7 @@ import 'package:war/src/services/get_correct_territory.dart';
 
 class TerritoryItemWidget extends StatefulWidget {
   final Territory territory;
-  final User user;
+  final User? user;
   final Function() onTap;
   const TerritoryItemWidget({
     Key? key,
@@ -51,7 +51,7 @@ class _TerritoryItemWidgetState extends State<TerritoryItemWidget> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            widget.user.name,
+                            "${widget.user?.name ?? ''}",
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(

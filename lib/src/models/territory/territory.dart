@@ -17,6 +17,12 @@ class Territory {
     required this.neighbors,
     required this.continentId,
   });
+  factory Territory.fromJson(Map<String, dynamic> map) => Territory(
+        id: map['id'],
+        name: map['name'],
+        neighbors: map['neighbors'].map<int>((e) => e).toList(),
+        continentId: map['continent_id'],
+      );
   Map<String, dynamic> get toMap => {
         /* 'id': id, */
         'name': name,

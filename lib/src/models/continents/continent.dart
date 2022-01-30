@@ -11,5 +11,13 @@ class Continent {
     required this.territories,
     required this.bonus,
   });
+  factory Continent.fromJson(Map<String, dynamic> map) => Continent(
+        id: map['id'],
+        name: map['name'],
+        territories: map['territories']
+            .map<Territory>((territory) => Territory.fromJson(territory))
+            .toList(),
+        bonus: map['bonus'],
+      );
   int get length => territories.length;
 }

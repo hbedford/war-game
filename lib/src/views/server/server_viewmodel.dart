@@ -1,23 +1,28 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:hasura_connect/hasura_connect.dart';
 import 'package:war/main.dart';
 import 'package:war/src/models/continents/continent.dart';
-import 'package:war/src/models/objective/objective.dart';
+import 'package:war/src/models/failure/failure.dart';
 import 'package:war/src/models/server/server.dart';
 import 'package:war/src/models/territory/territory.dart';
 import 'package:war/src/models/user/user.dart';
-import 'package:war/src/services/data.dart';
+import 'package:war/src/services/data_info.dart';
+import 'package:war/src/services/resultlr.dart';
 import 'package:war/src/services/war_api.dart';
 import 'package:war/src/widgets/snackbar_error.dart';
 
-Data data = Data();
+DataInfo data = DataInfo();
 
 int _durationDefault = Duration(minutes: 4).inMilliseconds;
 
 class ServerViewModel with ChangeNotifier {
+  GetStorage _getStorage = GetStorage();
+  WARAPI _api = WARAPI();
   List<Continent> _continents = [
     data.americaDoNorte,
     data.americaDoSul,
@@ -77,28 +82,15 @@ class ServerViewModel with ChangeNotifier {
     return list;
   }
 
-  List<User> _users = [
-    User(
-        id: 0,
-        email: '',
-        name: 'Hugo',
-        objective: Objective(id: 0, name: 'nao sei'),
-        soldiers: 0),
-    User(
-        id: 1,
-        email: '',
-        name: 'Mayara',
-        objective: Objective(id: 0, name: 'nao sei'),
-        soldiers: 0),
-  ];
+  List<User> _users = [];
 
   List<User> get users => _users;
 
   User? _userSelected;
   User? get userSelected => _userSelected;
 
-  User? _me;
-  User? get me => _me;
+  User? _user;
+  User? get user => _user;
 
   Territory? _territorySelected;
   Territory? get territory => _territorySelected;
@@ -109,8 +101,25 @@ class ServerViewModel with ChangeNotifier {
   int get progressTimer => ((_currentTime * 100) / _durationDefault).round();
 
   bool _disposed = false;
+  Server? _server;
+  Server? get server => _server;
 
-  start() {
+  startGame() {
+    randomizePlayers();
+    changeSelectUser(_users.first);
+
+    loadTerritories();
+    timer();
+  }
+
+  randomizePlayers() {
+    List<User> list = _server!.users;
+    list.shuffle();
+    changeUsers(list);
+    _userSelected = list.first;
+  }
+
+  loadTerritories() {
     int indexUser = 0;
     while (territoriesWithoutUser.length > 0) {
       Territory territory = (territoriesWithoutUser..shuffle()).first;
@@ -120,17 +129,44 @@ class ServerViewModel with ChangeNotifier {
       else
         indexUser++;
     }
-    changeSelectUser(_users.first);
-    changeMe(_users.first);
-    timer();
-    /* addTerritories(); */
   }
 
-  updateServer(Server? value) {}
+  getUser() {
+    String? getData = _getStorage.read('user');
+    if (getData == null) return null;
+    User userLoaded = User.fromJson(jsonDecode(getData));
+    changeUser(userLoaded);
+  }
 
-  changeMe(User? value) {
-    _me = value;
+  changeUser(User value) {
+    _user = value;
     notifyListeners();
+  }
+
+  loadServer(int serverId) {
+    getUser();
+    startGame();
+  }
+
+  changeServer(Server value) {
+    _server = value;
+    notifyListeners();
+  }
+
+  changeUsers(List<User> value) {
+    _users = value;
+    notifyListeners();
+  }
+
+  updateServer(Server value) async {
+    changeServer(value);
+    Snapshot game = await _api.game(value.id);
+    startGame();
+    game.listen((resultGame) {
+      _continents = resultGame['data']['continents']
+          .map<Continent>((continent) => Continent.fromJson(continent))
+          .toList();
+    });
   }
 
   addUserOnTerritory(Territory territory, int indexUser) {
@@ -153,7 +189,7 @@ class ServerViewModel with ChangeNotifier {
   }
 
   bool attack(Territory territory, int userId) {
-    if (_userSelected!.id != _me!.id) {
+    if (_userSelected!.id != _user!.id) {
       ScaffoldMessenger.of(navigationApp.currentContext!).showSnackBar(
         SnackbarError(text: 'Não esta na sua vez'),
       );

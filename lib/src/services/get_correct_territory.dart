@@ -1,4 +1,4 @@
-import 'package:war/src/services/data.dart';
+import 'package:war/src/services/data_info.dart';
 
 class GetCorrectTerritory {
   GetCorrectTerritory._();
